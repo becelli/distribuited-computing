@@ -1,4 +1,4 @@
-package src.server;
+package src.server.services;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -9,14 +9,14 @@ import javax.imageio.ImageIO;
 
 import src.interfaces.Task;
 
-public class ImageProcessor implements Task<BufferedImage>, Serializable {
+public class ImageProcessingService implements Task<BufferedImage>, Serializable {
   public static void main(final String[] args) {
     final String inputImagePath = "mandelbrot.png";
 
     try {
       final BufferedImage inputImage = ImageIO.read(new File(inputImagePath));
 
-      final ImageProcessor imageProcessor = new ImageProcessor("grayscale", inputImage);
+      final ImageProcessingService imageProcessor = new ImageProcessingService("grayscale", inputImage);
       final BufferedImage grayscaleImage = imageProcessor.convertToGrayscale();
       final BufferedImage blurredImage = imageProcessor.blur();
 
@@ -31,7 +31,7 @@ public class ImageProcessor implements Task<BufferedImage>, Serializable {
 
   private BufferedImage inputImage;
 
-  public ImageProcessor(final String operation, final BufferedImage inputImage) {
+  public ImageProcessingService(final String operation, final BufferedImage inputImage) {
     this.operation = operation;
     this.inputImage = inputImage;
   }

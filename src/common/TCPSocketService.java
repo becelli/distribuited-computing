@@ -11,7 +11,7 @@ public class TCPSocketService {
   private ObjectInputStream socketInput;
   private ObjectOutputStream socketOutput;
 
-  public TCPSocketService(InetAddress address, int port) throws Exception {
+  public TCPSocketService(InetAddress address, int port) throws IOException {
     this.socket = new Socket(address, port);
     this.socketInput = new ObjectInputStream(socket.getInputStream());
     this.socketOutput = new ObjectOutputStream(socket.getOutputStream());
@@ -19,8 +19,8 @@ public class TCPSocketService {
 
   public TCPSocketService(Socket socket) throws IOException {
     this.socket = socket;
-    this.socketInput = new ObjectInputStream(socket.getInputStream());
     this.socketOutput = new ObjectOutputStream(socket.getOutputStream());
+    this.socketInput = new ObjectInputStream(socket.getInputStream());
   }
 
   public void send(Object object) throws IOException {

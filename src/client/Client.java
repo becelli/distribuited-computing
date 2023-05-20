@@ -8,6 +8,7 @@ import java.math.BigInteger;
 import java.net.InetAddress;
 import java.security.InvalidParameterException;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
@@ -17,21 +18,21 @@ import src.common.TCPSocketService;
 
 public class Client {
   public static void main(String args[]) {
-    Client client = new Client();
-    client.loop();
+    try {
+      Client client = new Client();
+      client.loop();
+    } catch (Exception e) {
+      System.out.println("Failed to start client: " + e.getMessage());
+    }
   }
 
   private TCPSocketService socketService;
   private InputReaderService inputReaderService;
   private Number[] mandelbrotParams;
 
-  private Client() {
-    try {
-      this.socketService = new TCPSocketService(InetAddress.getLocalHost(), 5000);
-      this.inputReaderService = new InputReaderService();
-    } catch (Exception e) {
-      System.out.println("Failed to create socket: " + e.getMessage());
-    }
+  private Client() throws Exception {
+    this.socketService = new TCPSocketService(InetAddress.getLocalHost(), 5000);
+    this.inputReaderService = new InputReaderService();
   }
 
   private void loop() {
@@ -148,9 +149,11 @@ public class Client {
     BigInteger[] fibonacciSequence = (BigInteger[]) socketService.receive();
 
     System.out.println("Saving the fibonacci sequence...");
-    String output = Stream.of(fibonacciSequence)
-        .map(n -> n.toString())
-        .reduce("", (acc, n) -> String.format("%s%s\n", acc, n));
+
+    String output = Stream.iterate(0, i -> i + 1)
+        .limit(fibonacciSequence.length)
+        .map(i -> String.format("%d: %d\n", i + 1, fibonacciSequence[i]))
+        .collect(Collectors.joining());
 
     System.out.println("Type the path to save the fibonacci sequence:");
     String outputFilePath = inputReaderService.readString();

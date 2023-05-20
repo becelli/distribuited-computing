@@ -1,4 +1,4 @@
-package src.server;
+package src.server.services;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -9,9 +9,9 @@ import javax.imageio.ImageIO;
 
 import src.interfaces.Task;
 
-public class MandelbrotGenerator implements Task<BufferedImage>, Serializable {
+public class MandelbrotGeneratorService implements Task<BufferedImage>, Serializable {
     public static void main(final String[] args) {
-        final MandelbrotGenerator mandelbrotGenerator = new MandelbrotGenerator(1920, 1080, 1, 0, 0, 256);
+        final MandelbrotGeneratorService mandelbrotGenerator = new MandelbrotGeneratorService(1920, 1080, 1, 0, 0, 256);
         final BufferedImage mandelbrotImage = mandelbrotGenerator.generateMandelbrotImage();
 
         try {
@@ -26,16 +26,24 @@ public class MandelbrotGenerator implements Task<BufferedImage>, Serializable {
     private final double zoom;
     private final double x_offset;
     private final double y_offset;
-
     private final int max_iter;
 
-    public MandelbrotGenerator(final int width, final int height, final double zoom, final double x_offset,
+    public MandelbrotGeneratorService(final int width, final int height, final double zoom, final double x_offset,
             final double y_offset, final int max_iter) {
         this.width = width;
         this.height = height;
         this.zoom = zoom;
         this.x_offset = x_offset;
         this.y_offset = y_offset;
+        this.max_iter = max_iter;
+    }
+
+    public MandelbrotGeneratorService(final int width, final int height, final int max_iter) {
+        this.width = width;
+        this.height = height;
+        this.zoom = Math.random() * 10;
+        this.x_offset = Math.random() * 10;
+        this.y_offset = Math.random() * 10;
         this.max_iter = max_iter;
     }
 

@@ -1,13 +1,13 @@
-package src.server;
+package src.server.services;
 
 import java.io.Serializable;
 import java.math.BigInteger;
 
 import src.interfaces.Task;
 
-public class Fibonacci implements Task<BigInteger[]>, Serializable {
+public class FibonacciGeneratorService implements Task<BigInteger[]>, Serializable {
   public static void main(final String[] args) {
-    final Fibonacci fibonacci = new Fibonacci(1000);
+    final FibonacciGeneratorService fibonacci = new FibonacciGeneratorService(1000);
     final BigInteger[] fibonacciNumbers = fibonacci.calculateFibonacciNumbers();
 
     for (int i = 0; i < fibonacciNumbers.length; i++) {
@@ -18,7 +18,7 @@ public class Fibonacci implements Task<BigInteger[]>, Serializable {
 
   private final int termCount;
 
-  public Fibonacci(final int termCount) {
+  public FibonacciGeneratorService(final int termCount) {
     this.termCount = termCount;
   }
 
