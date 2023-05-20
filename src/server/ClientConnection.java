@@ -13,11 +13,13 @@ import src.server.services.MandelbrotGeneratorService;
 
 public class ClientConnection implements Runnable {
   private TCPSocketService socketService;
+  private ExecutorService executorService;
 
-  public ClientConnection(Socket clientSocket) {
+  public ClientConnection(final ExecutorService executorService, final Socket clientSocket) {
     try {
+      this.executorService = executorService;
       this.socketService = new TCPSocketService(clientSocket);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       System.out.println(String.format("Failed to create socket: %s", e.getMessage()));
     }
   }
@@ -29,9 +31,10 @@ public class ClientConnection implements Runnable {
   private void handleClient() {
     try {
       while (true) {
-        String option = (String) socketService.receive();
+        final String option = (String) socketService.receive();
         System.out.println(String.format("Received option: %s", option));
 
+        System.out.println("-----------------------------");
         switch (option) {
           case "IMAGE_PROCESSING" -> {
             handleImageProcessing();
@@ -43,8 +46,9 @@ public class ClientConnection implements Runnable {
             handleFibonacci();
           }
         }
+        System.out.println("-----------------------------");
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       System.out.println(String.format("Failed to handle client: %s", e.getMessage()));
     }
   }
@@ -52,37 +56,35 @@ public class ClientConnection implements Runnable {
   private void handleImageProcessing() throws Exception {
     System.out.println("Handling image processing");
 
-    String operation = (String) socketService.receive();
+    final String operation = (String) socketService.receive();
     System.out.println("Received option: " + operation);
 
-    byte[] imageBytes = (byte[]) socketService.receive();
-    BufferedImage image = ImageConverterService.bytesToImage(imageBytes);
+    final byte[] imageBytes = (byte[]) socketService.receive();
+    final BufferedImage image = ImageConverterService.bytesToImage(imageBytes);
     System.out.println("Image received and is null? " + (image == null));
 
-    ImageProcessingService imageProcessor = new ImageProcessingService(operation, image);
-    BufferedImage processedImage = imageProcessor.execute();
+    final ImageProcessingService imageProcessor = new ImageProcessingService(operation, image);
+    final byte[] processedImage = executorService.executeTask(imageProcessor);
 
-    byte[] processedImageBytes = ImageConverterService.imageToBytes(processedImage);
-    socketService.send(processedImageBytes);
+    socketService.send(processedImage);
     System.out.println("Image processing done");
   }
 
   private void handleMandelbrot() throws IOException, ClassNotFoundException {
     System.out.println("Handling mandelbrot");
 
-    Number[] params = (Number[]) socketService.receive();
-    int width = params[0].intValue();
-    int height = params[1].intValue();
-    int maxIterations = params[2].intValue();
+    final Number[] params = (Number[]) socketService.receive();
+    final int width = params[0].intValue();
+    final int height = params[1].intValue();
+    final int maxIterations = params[2].intValue();
 
     System.out.println(String.format("Generating mandelbrot with width: %d, height: %d, maxIterations: %d", width,
         height, maxIterations));
-    MandelbrotGeneratorService mandelbrotGenerator = new MandelbrotGeneratorService(width, height, maxIterations);
-    BufferedImage image = mandelbrotGenerator.execute();
+    final MandelbrotGeneratorService mandelbrotGenerator = new MandelbrotGeneratorService(width, height, maxIterations);
+    final byte[] imageAsBytes = executorService.executeTask(mandelbrotGenerator);
 
     System.out.println("Sending image");
-    byte[] imageBytes = ImageConverterService.imageToBytes(image);
-    socketService.send(imageBytes);
+    socketService.send(imageAsBytes);
 
     System.out.println("Mandelbrot done");
   }
@@ -90,11 +92,11 @@ public class ClientConnection implements Runnable {
   private void handleFibonacci() throws IOException, ClassNotFoundException {
     System.out.println("Handling fibonacci");
 
-    int n = (int) socketService.receive();
+    final int n = (int) socketService.receive();
     System.out.println(String.format("Calculating the first %d fibonacci numbers", n));
 
-    FibonacciGeneratorService fibonacciCalculator = new FibonacciGeneratorService(n);
-    BigInteger[] result = fibonacciCalculator.execute();
+    final FibonacciGeneratorService fibonacciCalculator = new FibonacciGeneratorService(n);
+    final BigInteger[] result = executorService.executeTask(fibonacciCalculator);
 
     System.out.println("Sending result");
     socketService.send(result);

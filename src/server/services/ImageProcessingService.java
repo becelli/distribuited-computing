@@ -1,50 +1,42 @@
 package src.server.services;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 
-import javax.imageio.ImageIO;
-
+import src.common.ImageConverterService;
 import src.interfaces.Task;
 
-public class ImageProcessingService implements Task<BufferedImage>, Serializable {
-  public static void main(final String[] args) {
-    final String inputImagePath = "mandelbrot.png";
+public class ImageProcessingService implements Task<byte[]>, Serializable {
+  public static final long serialVersionUID = 1L;
+  private final String operation;
 
+  private final byte[] inputImageBytes;
+
+  public ImageProcessingService(final String operation, final BufferedImage inputImage) throws IOException {
+    this.operation = operation;
+    this.inputImageBytes = ImageConverterService.imageToBytes(inputImage);
+  }
+
+  public byte[] execute() {
+    System.out.println(String.format("I'm processing an image with operation: %s", operation));
+    BufferedImage outputImage = null;
     try {
-      final BufferedImage inputImage = ImageIO.read(new File(inputImagePath));
-
-      final ImageProcessingService imageProcessor = new ImageProcessingService("grayscale", inputImage);
-      final BufferedImage grayscaleImage = imageProcessor.convertToGrayscale();
-      final BufferedImage blurredImage = imageProcessor.blur();
-
-      ImageIO.write(grayscaleImage, "jpg", new File("output_grayscale.jpg"));
-      ImageIO.write(blurredImage, "jpg", new File("output_blurred.jpg"));
+      switch (operation) {
+        case "grayscale" -> outputImage = convertToGrayscale();
+        case "blur" -> outputImage = blur();
+        default -> throw new IllegalArgumentException("Unknown operation: " + operation);
+      }
+      return ImageConverterService.imageToBytes(outputImage);
     } catch (final IOException e) {
-      System.err.println("Error converting the image to grayscale: " + e.getMessage());
+      e.printStackTrace();
+      return null;
     }
   }
 
-  private final String operation;
+  public BufferedImage convertToGrayscale() throws IOException {
+    final BufferedImage inputImage = ImageConverterService.bytesToImage(inputImageBytes);
 
-  private BufferedImage inputImage;
-
-  public ImageProcessingService(final String operation, final BufferedImage inputImage) {
-    this.operation = operation;
-    this.inputImage = inputImage;
-  }
-
-  public BufferedImage execute() {
-    return switch (operation) {
-      case "grayscale" -> convertToGrayscale();
-      case "blur" -> blur();
-      default -> throw new IllegalArgumentException("Unknown operation: " + operation);
-    };
-  }
-
-  public BufferedImage convertToGrayscale() {
     final int width = inputImage.getWidth();
     final int height = inputImage.getHeight();
 
@@ -68,7 +60,9 @@ public class ImageProcessingService implements Task<BufferedImage>, Serializable
     return grayscaleImage;
   }
 
-  public BufferedImage blur() {
+  public BufferedImage blur() throws IOException {
+    final BufferedImage inputImage = ImageConverterService.bytesToImage(inputImageBytes);
+
     final int width = inputImage.getWidth();
     final int height = inputImage.getHeight();
 

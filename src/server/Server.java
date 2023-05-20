@@ -4,33 +4,35 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class Server {
-  public static void main(String args[]) {
+  public static void main(final String args[]) {
     try {
-      Server server = new Server(5000);
+      final Server server = new Server(5000);
       server.listen();
-    } catch (Exception e) {
-      System.out.println("Failed to create server: " + e.getMessage());
+    } catch (final Exception e) {
+      System.out.println(String.format("Failed to start server: %s", e.getMessage()));
     }
   }
 
-  private ServerSocket serverSocket;
+  private final ServerSocket serverSocket;
+  private final ExecutorService executorService;
 
-  public Server(int port) throws Exception {
+  public Server(final int port) throws Exception {
     serverSocket = new ServerSocket(port);
+    executorService = new ExecutorService();
   }
 
   private void listen() throws Exception {
     System.out.println(String.format("Server listening on port %d", this.serverSocket.getLocalPort()));
     while (true) {
-      Socket clientSocket = serverSocket.accept();
+      final Socket clientSocket = serverSocket.accept();
       System.out.println("Connection established with new client");
       handleNewClient(clientSocket);
     }
   }
 
-  private void handleNewClient(Socket clientSocket) {
-    ClientConnection clientConnection = new ClientConnection(clientSocket);
-    Thread connectionThread = new Thread(clientConnection);
+  private void handleNewClient(final Socket clientSocket) {
+    final ClientConnection clientConnection = new ClientConnection(executorService, clientSocket);
+    final Thread connectionThread = new Thread(clientConnection);
     connectionThread.start();
   }
 }

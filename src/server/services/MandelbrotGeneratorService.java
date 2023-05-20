@@ -1,26 +1,14 @@
 package src.server.services;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 
-import javax.imageio.ImageIO;
-
+import src.common.ImageConverterService;
 import src.interfaces.Task;
 
-public class MandelbrotGeneratorService implements Task<BufferedImage>, Serializable {
-    public static void main(final String[] args) {
-        final MandelbrotGeneratorService mandelbrotGenerator = new MandelbrotGeneratorService(1920, 1080, 1, 0, 0, 256);
-        final BufferedImage mandelbrotImage = mandelbrotGenerator.generateMandelbrotImage();
-
-        try {
-            ImageIO.write(mandelbrotImage, "png", new File("mandelbrot.png"));
-        } catch (final IOException e) {
-            System.err.println("Error generating the mandelbrot image: " + e.getMessage());
-        }
-    }
-
+public class MandelbrotGeneratorService implements Task<byte[]>, Serializable {
+    public static final long serialVersionUID = 1L;
     private final int width;
     private final int height;
     private final double zoom;
@@ -41,14 +29,20 @@ public class MandelbrotGeneratorService implements Task<BufferedImage>, Serializ
     public MandelbrotGeneratorService(final int width, final int height, final int max_iter) {
         this.width = width;
         this.height = height;
-        this.zoom = Math.random() * 10;
-        this.x_offset = Math.random() * 10;
-        this.y_offset = Math.random() * 10;
+        this.zoom = Math.max(Math.random() * 4.0 - 1.0, 1.0);
+        this.x_offset = Math.random() * 2.0 - 1.0;
+        this.y_offset = Math.random() * 2.0 - 1.0;
         this.max_iter = max_iter;
     }
 
-    public BufferedImage execute() {
-        return generateMandelbrotImage();
+    public byte[] execute() {
+        try {
+            System.out.println("I'm generating a mandelbrot image!");
+            return ImageConverterService.imageToBytes(generateMandelbrotImage());
+        } catch (final IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public BufferedImage generateMandelbrotImage() {

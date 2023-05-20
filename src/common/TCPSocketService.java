@@ -7,23 +7,23 @@ import java.net.InetAddress;
 import java.net.Socket;
 
 public class TCPSocketService {
-  private Socket socket;
-  private ObjectInputStream socketInput;
-  private ObjectOutputStream socketOutput;
+  private final Socket socket;
+  private final ObjectInputStream socketInput;
+  private final ObjectOutputStream socketOutput;
 
-  public TCPSocketService(InetAddress address, int port) throws IOException {
+  public TCPSocketService(final InetAddress address, final int port) throws IOException {
     this.socket = new Socket(address, port);
     this.socketInput = new ObjectInputStream(socket.getInputStream());
     this.socketOutput = new ObjectOutputStream(socket.getOutputStream());
   }
 
-  public TCPSocketService(Socket socket) throws IOException {
+  public TCPSocketService(final Socket socket) throws IOException {
     this.socket = socket;
     this.socketOutput = new ObjectOutputStream(socket.getOutputStream());
     this.socketInput = new ObjectInputStream(socket.getInputStream());
   }
 
-  public void send(Object object) throws IOException {
+  public void send(final Object object) throws IOException {
     socketOutput.writeObject(object);
   }
 

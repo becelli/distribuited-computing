@@ -8,16 +8,16 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 public class ImageConverterService {
-  public static BufferedImage bytesToImage(byte[] imageBytes) throws IOException {
-    ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(imageBytes);
-    BufferedImage image = ImageIO.read(byteArrayInputStream);
+  public static BufferedImage bytesToImage(final byte[] imageBytes) throws IOException {
+    final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(imageBytes);
+    final BufferedImage image = ImageIO.read(byteArrayInputStream);
     return image;
   }
 
-  public static byte[] imageToBytes(BufferedImage image) throws IOException {
-    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+  public static byte[] imageToBytes(final BufferedImage image) throws IOException {
+    final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
     ImageIO.write(image, "png", byteArrayOutputStream);
-    byte[] imageBytes = byteArrayOutputStream.toByteArray();
+    final byte[] imageBytes = byteArrayOutputStream.toByteArray();
     return imageBytes;
   }
 }

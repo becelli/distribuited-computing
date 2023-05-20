@@ -6,16 +6,7 @@ import java.math.BigInteger;
 import src.interfaces.Task;
 
 public class FibonacciGeneratorService implements Task<BigInteger[]>, Serializable {
-  public static void main(final String[] args) {
-    final FibonacciGeneratorService fibonacci = new FibonacciGeneratorService(1000);
-    final BigInteger[] fibonacciNumbers = fibonacci.calculateFibonacciNumbers();
-
-    for (int i = 0; i < fibonacciNumbers.length; i++) {
-      System.out.println(String.format("Fibonacci term %d: %d", i, fibonacciNumbers[i]));
-    }
-
-  }
-
+  public static final long serialVersionUID = 1L;
   private final int termCount;
 
   public FibonacciGeneratorService(final int termCount) {
@@ -23,6 +14,7 @@ public class FibonacciGeneratorService implements Task<BigInteger[]>, Serializab
   }
 
   public BigInteger[] execute() {
+    System.out.println(String.format("I'm generating %d fibonacci numbers!", termCount));
     return calculateFibonacciNumbers();
   }
 
